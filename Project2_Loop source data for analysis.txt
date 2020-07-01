@@ -1,0 +1,96 @@
+Option Explicit
+
+Sub aa()
+
+Dim i, LastRow, lastColumn, a, b, c As Integer
+
+Do Until Sheet1.Cells(1, Columns.Count).End(xlToLeft).Column = 6
+
+Sheet1.Copy after:=Sheet1
+
+ActiveSheet.Name = "aaa"
+
+Columns("k:n").Insert shift:=xlToRight
+
+Range("K" & 1).Value = "Chart of Account"
+Range("L" & 1).Value = "Type"
+Range("M" & 1).Value = "Sub-Type"
+Range("N" & 1).Value = "Date"
+
+LastRow = Cells(Rows.Count, 4).End(xlUp).Row
+
+For i = 2 To LastRow
+    If Len(Range("A" & i)) = 17 Then
+        a = InStr(Range("B" & i), "(")
+        b = InStrRev(Range("B" & i), ",")
+        c = InStr(Range("B" & i), ")")
+
+        Range("K" & i).Value = Left(Range("B" & i), a - 1)
+        Range("L" & i).Value = Mid(Range("B" & i), a + 1, b - a - 1)
+        Range("M" & i).Value = Mid(Range("B" & i), b + 2, c - b - 2)
+        Range("N" & i).Value = Left(Range("G" & 1), 3) & "-2020"
+
+    End If
+
+Next i
+
+Columns("B:B").Insert shift:=xlToRight
+For i = 2 To LastRow
+    If Len(Range("A" & i)) = 17 Then
+    Range("B" & i).Value = 17
+    Else
+    Range("B" & i).Value = ""
+    End If
+Next i
+
+Range("B" & 1).Value = 1
+
+On Error Resume Next
+Columns("b:b").SpecialCells(xlCellTypeBlanks).EntireRow.Delete
+On Error GoTo 0
+
+
+Columns("B:B").Delete
+
+lastcolumn = Cells(1, Columns.Count).End(xlToLeft).Column + 1
+Range(Columns(15), Columns(lastcolumn)).Delete
+Columns("C:F").Delete
+
+ActiveSheet.Name = Left(Range("c" & 1), 3) & "-20"
+
+Sheet1.Columns("G:J").Delete
+
+Loop
+
+
+'Combine
+
+Sheet1.Delete
+Dim WS_Count, N, M As Integer
+Dim ws As Worksheet
+WS_Count = ActiveWorkbook.Worksheets.Count
+Set ws = Worksheets.Add
+
+For N = 2 To WS_Count + 1
+    M = ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+    ActiveWorkbook.Worksheets(N).Range("a" & 1).CurrentRegion.Copy ws.Range("A" & M)
+Next N
+
+ws.Name = "Total"
+
+Dim P, Q As Long
+
+P = ws.Cells(Rows.Count, 1).End(xlUp).Row
+For Q = 2 To P
+    If Range("J" & Q).Value = "Date" Then
+    Range("J" & Q).EntireRow.Delete
+    End If
+Next Q
+
+End Sub
+
+
+
+
+
